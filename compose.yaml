@@ -1,0 +1,10 @@
+version: '1.0'
+
+services:
+  mycontainer:
+    image: azwan-airflow
+    build: .
+    volumes:
+      - ./working_files:/usr/local/airflow/working_files
+    ports:
+      - "8989:8080"
