@@ -7,3 +7,4 @@ papermill
 snowflake-connector-python
 apache-airflow-providers-papermill
 deltalake
+python-dotenv
