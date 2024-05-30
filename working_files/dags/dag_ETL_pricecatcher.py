@@ -28,7 +28,7 @@ def get_folder_name(**kwargs):
     
 def exec_extract_nbook(**kwargs):
     """
-    Execute ETL notebook using Papermill library
+    Load data from DOSM and save into parquet file
     """
     pm.execute_notebook(input_path = "./working_files/dags/nb_price_catcher_daily_load.ipynb", 
                         output_path = "./working_files/dags/papermill_logging/nb_price_catcher_daily_load.ipynb",
@@ -36,11 +36,19 @@ def exec_extract_nbook(**kwargs):
     
 def exec_load_nbook(**kwargs):
     """
-    Execute ETL notebook using Papermill library
+    Push parquet file into Snowflake
     """
     pm.execute_notebook(input_path = "./working_files/dags/nb_push_sf.ipynb", 
                         output_path = "./working_files/dags/papermill_logging/nb_push_sf.ipynb",
                         parameters= {'date' : '2022-02'})
+    
+def clean_aeon_data_notebook(**kwargs):
+    """
+    Call a stored procedure to clean data and insert them into different table
+    """
+    pm.execute_notebook(input_path = './working_files/dags/nb_callSP_clean_data.ipynb',
+                        output_path = "./working_files/dags/papermill_logging/nb_callSP_clean_data.ipynb"
+                        )
 
 print_folder = PythonOperator(dag=dag,
                            task_id='Task_PrintFolder',
@@ -54,5 +62,8 @@ push_to_snowflake = PythonOperator(dag=dag,
                            task_id='exec_load_nbook',
                            python_callable=exec_load_nbook)
 
+clean_data = PythonOperator(dag=dag,
+                           task_id='exec_clean_data',
+                           python_callable=clean_aeon_data_notebook)
 
-print_folder >> extract_from_dosm >> push_to_snowflake
+print_folder >> extract_from_dosm >> push_to_snowflake >> clean_data
