@@ -61,6 +61,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install python-dotenv \
+    && pip install requests \
     && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,papermill,snowflake,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install deltalake \
     && pip install 'redis==3.2' \

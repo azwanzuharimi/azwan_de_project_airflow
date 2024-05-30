@@ -30,29 +30,17 @@ def exec_extract_nbook(**kwargs):
     """
     Execute ETL notebook using Papermill library
     """
-    pm.execute_notebook(input_path = "./working_files/dags/nb_price_catcher_daily_load.ipynb", 
-                        output_path = "./working_files/dags/papermill_logging/nb_price_catcher_daily_load.ipynb",
-                        parameters= {'date' : '2022-02'})
+    pm.execute_notebook(input_path = "./working_files/dags/nb_price_catcher_initial_load.ipynb", 
+                        output_path = "./working_files/dags/papermill_logging/nb_price_catcher_initial_load.ipynb")
     
-def exec_load_nbook(**kwargs):
-    """
-    Execute ETL notebook using Papermill library
-    """
-    pm.execute_notebook(input_path = "./working_files/dags/nb_push_sf.ipynb", 
-                        output_path = "./working_files/dags/papermill_logging/nb_push_sf.ipynb",
-                        parameters= {'date' : '2022-02'})
 
 print_folder = PythonOperator(dag=dag,
                            task_id='Task_PrintFolder',
                            python_callable=get_folder_name)
 
 extract_from_dosm = PythonOperator(dag=dag,
-                           task_id='exec_extract_nbook',
+                           task_id='Init_First_Time_Load',
                            python_callable=exec_extract_nbook)
 
-push_to_snowflake = PythonOperator(dag=dag,
-                           task_id='exec_load_nbook',
-                           python_callable=exec_load_nbook)
 
-
-print_folder >> extract_from_dosm >> push_to_snowflake
+print_folder >> extract_from_dosm
